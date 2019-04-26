@@ -49,7 +49,7 @@ function onLoadPhotos() {
     const albumId = el.getAttribute('data-album-id');
 
     const xhr = new XMLHttpRequest();
-    xhr.addEventListener('load', onAlbumsReceived);
+    xhr.addEventListener('load', onPhotosReceived);
     xhr.open('GET', BASE_URL + '/photos?albumId=' + albumId);
     xhr.send();
 }
@@ -61,17 +61,18 @@ function createAlbumsList(albums) {
     for (let i = 0; i < albums.length; i++) {
         const album = albums[i];
 
-        // creating paragraph
-        const strongEl = document.createElement('strong');
-        strongEl.textContent = album.title;
 
+        const albumId = document.createAttribute('data-album-id');
+        albumId.value = album.id;
 
-        const pEl = document.createElement('p');
-        pEl.appendChild(strongEl);
+        const buttonEl = document.createElement('button');
+        buttonEl.textContent = album.title;
+        buttonEl.setAttributeNode(albumId);
+        buttonEl.addEventListener('click', onLoadPhotos);
 
         // creating list item
         const liEl = document.createElement('li');
-        liEl.appendChild(pEl);
+        liEl.appendChild(buttonEl);
 
         ulEl.appendChild(liEl);
     }
@@ -80,6 +81,8 @@ function createAlbumsList(albums) {
 }
 
 function onAlbumsReceived() {
+    commentsDivEl.style.display = 'none';
+    postsDivEl.style.display = 'none';
     albumsDivEl.style.display = 'block';
 
     const text = this.responseText;
@@ -116,15 +119,6 @@ function createCommentsList(comments) {
         const pEl = document.createElement('p');
         pEl.appendChild(strongEl);
         pEl.appendChild(document.createTextNode(`: ${comment.body}`));
-
-        //photobutton
-        const dataPhotoIdAttr = document.createAttribute('data-album-id');
-        dataPhotoIdAttr.value = user.id;
-
-        const buttonElPho = document.createElement('button');
-        buttonElPho.textContent = "view photo";
-        buttonElPho.setAttributeNode(dataPhotoIdAttr);
-        buttonElPho.addEventListener('click', onLoadPhotos);
 
         // creating list item
         const liEl = document.createElement('li');
